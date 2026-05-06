@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.js
+*.log
+data.json
+test_*.js
+test_*.ts
+register.ts

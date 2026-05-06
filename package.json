@@ -1,0 +1,40 @@
+{
+  "name": "@fford-medical/logging-middleware",
+  "version": "1.0.0",
+  "description": "Reusable logging middleware for FFord Medical applications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "logging",
+    "middleware",
+    "medical",
+    "fford"
+  ],
+  "author": "FFord Medical Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.16.0",
+    "express": "^4.18.0",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.8",
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "eslint": "^8.54.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.2"
+  },
+  "peerDependencies": {
+    "express": "^4.18.0"
+  }
+}
