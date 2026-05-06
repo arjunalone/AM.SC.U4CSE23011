@@ -1,0 +1,17 @@
+{
+  "name": "vehicle_scheduling",
+  "version": "1.0.0",
+  "description": "Vehicle maintenance scheduling solution",
+  "main": "scheduler.ts",
+  "scripts": {
+    "start": "npx tsx scheduler.ts"
+  },
+  "dependencies": {
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.3"
+  }
+}
