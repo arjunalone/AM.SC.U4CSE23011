@@ -1,8 +1,10 @@
 node_modules/
 dist/
-*.js
 *.log
 data.json
 test_*.js
 test_*.ts
 register.ts
+campus_notifications_backend/node_modules/
+campus_notifications_backend/dist/
+campus_notifications_backend/.env
