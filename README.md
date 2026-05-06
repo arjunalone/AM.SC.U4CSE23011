@@ -1,206 +1,116 @@
-# FFord Medical Logging Middleware
+# Campus Notifications Microservice
 
-A reusable logging middleware package designed for FFord Medical applications with comprehensive logging capabilities and Express.js integration.
+**Student:** A. Arjun | **Roll No:** AM.SC.U4CSE23011 | **GitHub:** arjunalone
 
-## Features
+---
 
-- **Reusable logging function** with structured parameters
-- **Express middleware integration** for automatic request/response logging
-- **Multiple log levels** (error, warn, info, debug)
-- **Medical-specific logging scenarios**
-- **Test condition validation logging**
-- **Winston-based** with multiple transport options
-- **TypeScript support** with full type definitions
+## What is this project?
 
-## Installation
+This is a **backend system for a college campus notification platform** where students get real-time alerts about:
+- 📢 **Placements** — companies coming to campus for hiring
+- 🎉 **Events** — college events like tech-fest, farewell, etc.
+- 📊 **Results** — exam results like mid-sem, project-review, etc.
 
+The project has **two parts**:
+
+---
+
+### Part 1 — Logging Middleware (`src/index.ts`)
+A reusable TypeScript library that any backend service can use to **send logs to a central server**.
+
+Think of it like a `console.log()` but it sends the log over the internet to a monitoring service instead of just printing it.
+
+**How to use it:**
+```typescript
+import { Log } from './src/index';
+
+Log('backend', 'info', 'handler', 'User fetched notifications');
+Log('backend', 'error', 'db', 'Database connection failed');
+```
+
+---
+
+### Part 2 — Campus Notifications Backend (`campus_notifications_backend/`)
+A **REST API server** built with Express.js that:
+- Fetches live campus notifications from the evaluation service
+- Exposes clean API endpoints that a frontend app can call
+- Supports **real-time streaming** using SSE (Server-Sent Events)
+
+**API Endpoints:**
+| Method | URL | What it does |
+|--------|-----|--------------|
+| GET | `/health` | Check if server is running |
+| GET | `/api/v1/notifications` | Get all notifications |
+| GET | `/api/v1/notifications?type=Placement` | Filter by type |
+| GET | `/api/v1/notifications/:id` | Get one notification |
+| GET | `/api/v1/sse/notifications` | Real-time stream of new notifications |
+
+---
+
+### Part 3 — System Design Document (`notification_system_design.md`)
+A written design document covering 5 stages:
+- **Stage 1** — REST API design with request/response structure
+- **Stage 2** — Database selection (PostgreSQL) and schema design
+- **Stage 3** — Query optimization and indexing strategy
+- **Stage 4** — Caching strategy using Redis to reduce DB load
+- **Stage 5** — Reliable bulk notification system using Message Queues
+
+---
+
+## How to Run
+
+### Run the Notifications Backend
 ```bash
-npm install @fford-medical/logging-middleware
+cd campus_notifications_backend
+npm install
+node dist/server.js
 ```
+Server starts at: `http://localhost:3000`
 
-## Basic Usage
+### Test with Postman
 
-### Simple Logging Function
-
-```typescript
-import log from '@fford-medical/logging-middleware';
-import { LogLevel } from '@fford-medical/logging-middleware';
-
-// Basic logging
-log('backend', LogLevel.INFO, 'user-service', 'User created successfully', true);
-
-// Error logging
-log('backend', LogLevel.ERROR, 'database-handler', 'Connection failed', false);
-
-// With metadata
-log('backend', LogLevel.DEBUG, 'auth-middleware', 'Token validated', true, {
-  userId: '12345',
-  tokenExpiry: '2024-01-01T00:00:00Z'
-});
+**Step 1 — Get a token:**
 ```
+POST http://20.207.122.201/evaluation-service/auth
+Content-Type: application/json
 
-### Function Parameters
-
-The `log` function accepts the following parameters:
-
-- **service** (string): Service name (e.g., "backend", "frontend", "api")
-- **level** (LogLevel): Log level (ERROR, WARN, INFO, DEBUG)
-- **handler** (string): Handler/function name where logging occurs
-- **message** (string): Log message or received string
-- **expected** (boolean, optional): Expected boolean value or condition
-- **metadata** (object, optional): Additional metadata
-
-## Express Integration
-
-### Middleware Setup
-
-```typescript
-import express from 'express';
-import { loggingMiddleware, errorLoggingMiddleware } from '@fford-medical/logging-middleware';
-
-const app = express();
-
-// Add logging middleware
-app.use(loggingMiddleware);
-app.use(errorLoggingMiddleware);
-
-// Your routes here
-app.get('/api/patients', (req, res) => {
-  // Manual logging if needed
-  log('backend', LogLevel.INFO, 'patient-controller', 'Fetching patients', true);
-  res.json({ patients: [] });
-});
-```
-
-### Custom Logger Instance
-
-```typescript
-import { FFordLogger, LogLevel } from '@fford-medical/logging-middleware';
-
-const medicalLogger = new FFordLogger('patient-service');
-
-medicalLogger.log(
-  'backend',
-  LogLevel.INFO,
-  'patient-create',
-  'Patient record created',
-  true,
-  { patientId: 'PAT-001', age: 45 }
-);
-```
-
-## Medical-Specific Examples
-
-### Prescription Logging
-
-```typescript
-log('backend', LogLevel.INFO, 'prescription-service', 'Prescription issued', true, {
-  prescriptionId: 'RX-001',
-  patientId: 'PAT-001',
-  medication: 'Amoxicillin',
-  dosage: '500mg',
-  prescribedBy: 'Dr. Smith'
-});
-```
-
-### Lab Results Logging
-
-```typescript
-log('backend', LogLevel.INFO, 'lab-service', 'Lab results processed', true, {
-  testId: 'LAB-001',
-  patientId: 'PAT-001',
-  testType: 'Blood Count',
-  result: 'Normal'
-});
-```
-
-### Critical Alerts
-
-```typescript
-log('backend', LogLevel.ERROR, 'alert-service', 'Critical condition detected', false, {
-  patientId: 'PAT-001',
-  condition: 'Hypertension Crisis',
-  bloodPressure: '180/120',
-  timestamp: new Date().toISOString()
-});
-```
-
-## Test Condition Logging
-
-```typescript
-// Pre-test setup
-log('backend', LogLevel.INFO, 'test-setup', 'Pre-test environment setup initiated', true);
-
-// Test condition validation
-const testCondition = true;
-log('backend', LogLevel.DEBUG, 'test-validator', 'Test condition validation', testCondition, {
-  condition: 'Database connection available',
-  expected: true,
-  actual: testCondition
-});
-
-// Test result
-log('backend', LogLevel.INFO, 'test-runner', 'Test execution completed', testCondition, {
-  testName: 'Database Connection Test',
-  passed: testCondition,
-  executionTime: '150ms'
-});
-```
-
-## Configuration
-
-### Environment Variables
-
-- `LOG_LEVEL`: Set minimum log level (default: 'info')
-
-### Log Files
-
-The middleware creates log files in the `logs/` directory:
-- `error.log`: Error-level logs only
-- `combined.log`: All logs
-
-### Custom Configuration
-
-```typescript
-import { FFordLogger } from '@fford-medical/logging-middleware';
-
-const customLogger = new FFordLogger('my-service');
-```
-
-## Log Output Format
-
-Each log entry includes:
-
-```json
 {
-  "service": "backend",
-  "level": "info",
-  "handler": "user-service",
-  "message": "User created successfully",
-  "expected": true,
-  "timestamp": "2024-01-01T12:00:00.000Z",
-  "metadata": {
-    "userId": "12345"
-  }
+  "email": "anipeddiarjun@gmail.com",
+  "name": "A.arjun",
+  "mobileNo": "9182355621",
+  "githubUsername": "arjunalone",
+  "rollNo": "AM.SC.U4CSE23011",
+  "accessCode": "PTBMmQ",
+  "clientID": "a5291495-80f2-44d3-a081-ba7c289d0bdd",
+  "clientSecret": "jezdyHXBcHFJFCJB"
 }
 ```
 
-## Development
-
-```bash
-# Install dependencies
-npm install
-
-# Build the package
-npm run build
-
-# Run tests
-npm test
-
-# Start development mode
-npm run dev
+**Step 2 — Get notifications:**
+```
+GET http://20.207.122.201/evaluation-service/notifications
+Authorization: Bearer <token from step 1>
 ```
 
-## License
+**Step 3 — Send a log:**
+```
+POST http://20.207.122.201/evaluation-service/logs
+Authorization: Bearer <token from step 1>
+Content-Type: application/json
 
-MIT License - FFord Medical Team
+{
+  "stack": "backend",
+  "level": "info",
+  "package": "handler",
+  "message": "your log message here"
+}
+```
+
+---
+
+## Tech Stack
+- **Language:** TypeScript
+- **Framework:** Express.js
+- **HTTP Client:** Axios
+- **Real-time:** Server-Sent Events (SSE)
+- **Auth:** Bearer JWT tokens from evaluation service
